@@ -9,6 +9,35 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function logout(){
+        auth()->logout();
+        return redirect('/')->with('success','You are now logged out');
+       
+    }
+    public function showCorrectHomepage(){
+        if(auth()->check()){
+            return view('homepage-feed');
+        }
+        else{
+            return view('homepage');
+        }
+    }
+    public function login(Request $request){
+        $incomingField = $request->validate([
+            'loginusername'=>'required',
+            'loginpassword'=>'required'
+        ]);
+        if(auth()->attempt(['username'=>$incomingField['loginusername'],'password'=> $incomingField['loginpassword']])){
+           $request->session()->regenerate();
+            return redirect('/')->with('success','You are successfully logged in');
+
+        }
+        else{
+            return redirect('/')->with('failure','Invalid login');
+        }
+
+    }
+
     //
     public function register(Request $request){
         $incomingField = $request->validate([
@@ -16,7 +45,10 @@ class UserController extends Controller
          'password'=> ['required','min:6','confirmed'],
          'email'=> ['required','email',Rule::unique('users','email')]
         ]);
-        User::create($incomingField);
-        return view("registerpage");
+        $incomingField['password'] = bcrypt($incomingField['password']);
+        $user = User::create($incomingField);
+        auth()->login($user);
+
+        return redirect('/')->with('success','Thanks for your registration');
     }
 }
