@@ -26,8 +26,14 @@ Route::post('/login',[UserController::class,"login"]);
 Route::post('/logout',[UserController::class,"logout"]);
 
 // blog related route
-Route::get("/create-post",[PostController::class,'showCreateForm']);
-Route::post("/create-post",[PostController::class,'storeNewPost']);
+Route::get("/create-post",[PostController::class,'showCreateForm'])->middleware('auth');
+Route::post("/create-post",[PostController::class,'storeNewPost'])->name('login');
 Route::get("/post/{post}",[PostController::class,'viewSinglePost']);
-Route::get("/viewpost",[PostController::class,'viewpost']);
+Route::get("/profile",[UserController::class,'userProfile']);
+Route::get("/viewpost/{user_id}",[PostController::class,'viewPostById']);
+Route::get("/avatarupload",[PostController::class,'avatarUploadPage']);
+Route::post("/avatarupload",[PostController::class,'avatarUpload']);
+
+
+
 ?>

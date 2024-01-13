@@ -51,4 +51,14 @@ class UserController extends Controller
 
         return redirect('/')->with('success','Thanks for your registration');
     }
+    public function userProfile(){
+        if (auth()->check()) {
+            $user = auth()->user();
+            return view('profile', ['user' => $user]);
+        } else {
+            return view('unauthenticated');
+        }
+        
+
+    }
 }
