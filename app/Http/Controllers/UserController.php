@@ -51,13 +51,10 @@ class UserController extends Controller
 
         return redirect('/')->with('success','Thanks for your registration');
     }
-    public function userProfile(){
-        if (auth()->check()) {
-            $user = auth()->user();
-            return view('profile', ['user' => $user]);
-        } else {
-            return view('unauthenticated');
-        }
+    // making profile page  alive
+    public function userProfile(User $user ){
+
+        return view('profile',['username'=> $user->username,'posts'=>$user->posts()->latest()->get(), 'postCount'=>$user->posts()->count()]);
         
 
     }

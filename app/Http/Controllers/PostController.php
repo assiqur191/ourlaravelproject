@@ -11,14 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+
+  public function delete(Post $post){
+    //making delete button alive
+   if(auth()->user()->cannot('delete',$post)){
+    return 'You cannot do that';
+   }
+   $post->delete();
+   return redirect('/profile/'.auth()->user()->username)->with('success','you are succesfuly delete the post');
+
+    
+  }
     //
     public function showCreateForm(){
-      if(auth()){
-        return view("create-post");
-      }
-      else{
-        redirect('/');
-      }
+      return view("create-post");
 
     }
     public function storeNewPost(Request $request){
@@ -76,17 +82,18 @@ class PostController extends Controller
                                                        $user->avatar =$imagePath;
                                                     
                                                        $user-> save;
-                                                       $avatar = new Avatar([
-                                                        'path' => $imagePath
-                                                    ]);
+                                                    //    $avatar = new Avatar([
+                                                    //     'path' => $imagePath
+                                                    // ]);
                                                 
                                                     // Associate the avatar with the user
-                                                    $user->avataruser()->save($avatar);
+                                                    // $user->avataruser()->save($avatar);
                                                 
-                                                    // Retrieve the latest avatar path
-                                                    $latestAvatarPath = $user->avataruser()->latest()->value('path');
+                                                    // // Retrieve the latest avatar path
+                                                    // $latestAvatarPath = $user->avataruser()->latest()->value('path');
+                                                    // // print_r($latestAvatarPath);
                                                       
-                                                       return redirect('/')->with('success','Image upload successfully')->with('latestAvatarPath', $latestAvatarPath);
+                                                       return redirect('/')->with('success','Image upload successfully');
                                                      
 
         

@@ -3,8 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Image;
-use App\Models\Avatar;
+
 use Laravel\Sanctum\HasApiTokens;
 use app\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
@@ -17,13 +16,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-
-    public function avatars()
-    {
-        return $this->hasMany(Avatar::class);
-    }
-
-    
     /**
      * The attributes that are mass assignable.
      *
@@ -33,7 +25,7 @@ class User extends Authenticatable
          'username',
          'email',
          'password',
-         'avatar'
+         
     ];
 
     
@@ -76,4 +68,7 @@ class User extends Authenticatable
 		$this->fillable = $fillable;
 		return $this;
 	}
+    public function posts(){
+        return $this->hasMany(Post::class, 'user_id');
+    }
 }
