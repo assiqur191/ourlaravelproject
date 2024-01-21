@@ -12,11 +12,28 @@ use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
 
+  public function showEditPost(Post $post){
+    return view('edit-post',['post'=> $post]);
+  }
+  //post edit and update in this function
+   public function updatePost(Post $post, Request $request){
+    $incomingPost= $request->validate([
+      'title'=>['required','string','max:60'],
+      'body'=> ['required']
+    ]);
+     $incomingPost['title']= strip_tags($incomingPost['title']);
+     $incomingPost['body']=strip_tags($incomingPost['body']);
+
+     $post->update($incomingPost);
+     return back()->with('success','your post update successfully');
+ 
+   }
+
   public function delete(Post $post){
     //making delete button alive
-   if(auth()->user()->cannot('delete',$post)){
-    return 'You cannot do that';
-   }
+  //  if(auth()->user()->cannot('delete',$post)){
+  //   return 'You cannot do that';
+  //  }
    $post->delete();
    return redirect('/profile/'.auth()->user()->username)->with('success','you are succesfuly delete the post');
 
