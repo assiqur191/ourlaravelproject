@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FollowController;
 
 
 /*
@@ -32,14 +33,22 @@ Route::get("/post/{post}",[PostController::class,'viewSinglePost'])->middleware(
 Route::delete("/post/{post}",[PostController::class,'delete'])->middleware('mustBeLogin')->middleware('can:delete,post');
 Route::get("/post/{post}/edit",[PostController::class,'showEditPost'])->middleware('mustBeLogin');
 Route::put("/post/{post}",[PostController::class,'updatePost'])->middleware('mustBeLogin')->middleware('can:update,post');
+Route::get("/search/{term}",[PostController::class,'search'])->middleware('mustBeLogin');
+
+
+//follow related route
+Route::post("/create-follow/{username}",[FollowController::class,'createFollow'])->middleware('mustBeLogin');
+Route::post("/remove-follow/{username}",[FollowController::class,'removeFollow'])->middleware('mustBeLogin');
 
 
 // profile related route
 
 Route::get("/profile/{user:username}",[UserController::class,'userProfile'])->middleware('mustBeLogin');
+Route::get("/profile/{user:username}/followers",[UserController::class,'profileFollowers'])->middleware('mustBeLogin');
+Route::get("/profile/{user:username}/following",[UserController::class,'profileFollowing'])->middleware('mustBeLogin');
 Route::get("/viewpost/{user_id}",[PostController::class,'viewPostById'])->middleware('mustBeLogin');
 Route::get("/avatarupload",[PostController::class,'avatarUploadPage'])->middleware('mustBeLogin');
-Route::post("/avatarupload",[PostController::class,'avatarUpload'])->middleware('mustBeLogin');
+Route::post("/avatarupload",[UserController::class,'avatarUpload'])->middleware('mustBeLogin');
 
 
 

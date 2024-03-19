@@ -32,7 +32,9 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
+            'root' => storage_path('app/public/avatars'),
+            'url'=> env('APP_URL').'/storage/avatars',
+            'visibility'=>'public',
             'throw' => false,
         ],
 
@@ -70,7 +72,7 @@ return [
     */
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage') => storage_path('app/public/avatars'),
     ],
 
 ];
