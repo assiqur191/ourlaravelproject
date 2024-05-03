@@ -1,10 +1,12 @@
 <?php
 
+use App\Events\chatMassage;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FollowController;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,28 @@ Route::get("/viewpost/{user_id}",[PostController::class,'viewPostById'])->middle
 Route::get("/avatarupload",[PostController::class,'avatarUploadPage'])->middleware('mustBeLogin');
 Route::post("/avatarupload",[UserController::class,'avatarUpload'])->middleware('mustBeLogin');
 
+// chat related route
+Route::post('/send-chat-message', function (Request $request) {
+    // Validate the incoming request
+    $incomingChat = $request->validate([
+       'textvalue' => 'required'
+    ]);
 
+    // Check if the 'textvalue' field is not empty after stripping HTML tags
+    if (!trim(strip_tags($incomingChat['textvalue']))) {
+        // Return a response indicating no content if the message is empty
+        return response()->noContent();
+    }
+
+    // Broadcast the chat message
+    broadcast(new ChatMassage([
+        'username' => auth()->user()->username,
+        'textvalue' => strip_tags($request->textvalue),
+        'avatar' => auth()->user()->avatar
+    ]))->toOthers();
+
+    // Return a response indicating success
+    return response()->noContent();
+})->middleware('mustBeLogin');
 
 ?>

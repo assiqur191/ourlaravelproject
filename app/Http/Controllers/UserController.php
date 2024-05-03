@@ -3,46 +3,19 @@
 namespace App\Http\Controllers;
 
 
+use App\Events\OurExampleEvent;
 use App\Models\User;
 use App\Models\Follow;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\View as FacadesView;
+
 
 
 class UserController extends Controller
 {
-    public function logout()
-    {
-        auth()->logout();
-        return redirect('/')->with('success', 'You are now logged out');
-
-    }
-    public function showCorrectHomepage()
-    {
-        if (auth()->check()) {
-            return view('homepage-feed',['posts'=> auth()->user()->postFeed()->latest()->paginate(5)]);
-        } else {
-            return view('homepage');
-        }
-    }
-    public function login(Request $request)
-    {
-        $incomingField = $request->validate([
-            'loginusername' => 'required',
-            'loginpassword' => 'required'
-        ]);
-        if (auth()->attempt(['username' => $incomingField['loginusername'], 'password' => $incomingField['loginpassword']])) {
-            $request->session()->regenerate();
-            return redirect('/')->with('success', 'You are successfully logged in');
-
-        } else {
-            return redirect('/')->with('failure', 'Invalid login');
-        }
-
-    }
-
+    
     //
     public function register(Request $request)
     {
@@ -55,7 +28,42 @@ class UserController extends Controller
         $user = User::create($incomingField);
         auth()->login($user);
 
+       // event(new Registered(['username'=> auth()->user()->username,'action'=>'registerd']));
+
         return redirect('/')->with('success', 'Thanks for your registration');
+    }
+    public function logout()
+    {
+        event(new OurExampleEvent(['username'=> auth()->user()->username ,'action'=>'logout']));
+        auth()->logout();
+        return redirect('/')->with('success', 'You are now logged out');
+
+    }
+   
+    public function login(Request $request)
+    {
+        $incomingField = $request->validate([
+            'loginusername' => 'required',
+            'loginpassword' => 'required'
+        ]);
+        if (auth()->attempt(['username' => $incomingField['loginusername'], 'password' => $incomingField['loginpassword']])) {
+            $request->session()->regenerate();
+            event(new OurExampleEvent(['username'=> auth()->user()->username ,'action'=>'login']));
+            return redirect('/')->with('success', 'You are successfully logged in');
+
+        } else {
+            return redirect('/')->with('failure', 'Invalid login');
+        }
+
+    }
+
+    public function showCorrectHomepage()
+    {
+        if (auth()->check()) {
+            return view('homepage-feed',['posts'=> auth()->user()->postFeed()->latest()->paginate(5)]);
+        } else {
+            return view('homepage');
+        }
     }
     // making profile page  alive
     private function getSharedData($user){
@@ -110,7 +118,11 @@ class UserController extends Controller
 
         
 
-
+// $datacheck = $user->followingTheseUser()->latest()->get();
+// foreach($datacheck as $data){
+//     print_r($data);
+//     echo ("</br>");
+// }
         return view('profile-following',[ 'following' => $user->followingTheseUser()->latest()->get()] );
 
 
